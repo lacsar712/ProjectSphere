@@ -1,0 +1,8 @@
+.git
+**/node_modules
+**/dist
+**/.env
+**/*.log
+FRONTEND/README.md
+BACKEND/vercel.json
+FRONTEND/netlify.toml

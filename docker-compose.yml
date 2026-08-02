@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  backend:
+    build: ./BACKEND
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      LOCAL_OFFLINE: "true"
+      SKIP_EMAIL_VERIFICATION: "true"
+      MONGODB_URI: mongodb://mongo:27017/projectsphere
+      JWT_SECRET: ${JWT_SECRET:-projectsphere_docker_jwt_secret_change_me}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-projectsphere_docker_refresh_secret_change_me}
+      FRONTEND_URL: http://localhost:7310
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@projectsphere.com}
+      SEED_PASSWORD: ${SEED_PASSWORD:-Admin@1234}
+    volumes:
+      - upload_data:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  frontend:
+    build: ./FRONTEND
+    restart: always
+    ports:
+      - "7310:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  upload_data:

@@ -1,0 +1,12 @@
+# Proxy all /api/* calls to the Vercel backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://project-sphere-phi.vercel.app/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback — must come LAST so it doesn't catch /api/* first
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
